@@ -105,12 +105,13 @@ public class NumberTriangle {
      */
     public static NumberTriangle loadTriangle(String fname) throws IOException {
         // open the file and get a BufferedReader object whose methods
-        // are more convenient to work with when reading the file contents.
         InputStream inputStream = NumberTriangle.class.getClassLoader().getResourceAsStream(fname);
+        if (inputStream == null) {
+            throw new FileNotFoundException("File not found: " + fname);
+        }
+        // are more convenient to work with when reading the file contents.
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-
-
-        // TODO define any variables that you want to use to store things
+        NumberTriangle[] currentBottomRow = null;
 
         // will need to return the top of the NumberTriangle,
         // so might want a variable for that.
@@ -118,18 +119,25 @@ public class NumberTriangle {
 
         String line = br.readLine();
         while (line != null) {
-
-            // remove when done; this line is included so running starter code prints the contents of the file
-            System.out.println(line);
-
-            // TODO process the line
-
-            //read the next line
+            String[] tokens = line.trim().split("\\s+");
+            NumberTriangle[] newRow = new NumberTriangle[tokens.length];
+            for (int i = 0; i < tokens.length; i++) {
+                newRow[i] = new NumberTriangle(Integer.parseInt(tokens[i]));
+            }
+            if (currentBottomRow != null) {
+                for (int i = 0; i < newRow.length; i++) {
+                    newRow[i].setLeft(currentBottomRow[i]);
+                    newRow[i].setRight(currentBottomRow[i + 1]);
+                }
+            }
+            currentBottomRow = newRow;
+            top = newRow[0];
             line = br.readLine();
         }
         br.close();
         return top;
     }
+
 
     public static void main(String[] args) throws IOException {
 
